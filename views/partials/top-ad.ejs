@@ -1,0 +1,77 @@
+<% const topList = Array.isArray(topAds) ? topAds : []; %>
+
+<% if (topList.length > 0) { %>
+<div class="top-banner-wrapper" aria-hidden="false">
+    <% topList.forEach((ad, i) => { %>
+    <% let deviceClass = ''; if (ad.deviceTarget === 'desktop') { deviceClass = 'ad-desktop-only'; } if (ad.deviceTarget === 'mobile') { deviceClass = 'ad-mobile-only'; } %>
+    <% const height = ad.height || 350; const width = ad.width || 970; %>
+    <a
+        href="<%= ad.link || '#' %>"
+        class="top-banner side-ad <%= i === 0 ? 'active' : '' %> <%= deviceClass %>"
+        data-rotate-ms="<%= (ad.rotateSeconds || 7) * 1000 %>"
+        data-ad-height="<%= height %>"
+        style="--top-ad-h:<%= height %>px; --top-ad-w:<%= width %>px;"
+        target="_blank"
+        rel="nofollow sponsored noopener"
+        aria-label="Üst banner">
+        <% const adMedia = ad.media || ad.image; %>
+        <% if ((ad.mediaType === 'video') && adMedia) { %>
+            <video src="<%= adMedia %>" autoplay muted loop playsinline preload="metadata"></video>
+        <% } else { %>
+            <img src="<%= adMedia %>" alt="<%= ad.name || 'Reklam' %>"/>
+        <% } %>
+    </a>
+    <% }) %>
+</div>
+
+<script>
+    (function() {
+        const wrapper = document.querySelector('.top-banner-wrapper');
+        if (!wrapper) return;
+        const banners = Array.from(wrapper.querySelectorAll('.top-banner'));
+        if (!banners.length) return;
+
+        function getPreferredBanner() {
+            const screenWidth = window.innerWidth || document.documentElement.clientWidth;
+            const isMobile = screenWidth <= 1024;
+            const candidate = banners.find(b => {
+                return isMobile ? !b.classList.contains('ad-desktop-only') : !b.classList.contains('ad-mobile-only');
+            });
+            return candidate || banners[0];
+        }
+
+        function activateBanner(banner) {
+            if (!banner) return null;
+            banners.forEach(b => b.classList.remove('active'));
+            banner.classList.add('active');
+            return banner;
+        }
+
+        function applyTopBannerState() {
+            const active = activateBanner(getPreferredBanner());
+            if (!active) return;
+            const h = parseInt(active.dataset.adHeight || '250', 10);
+            document.body.classList.add('with-top-fixed-ad');
+            document.documentElement.style.setProperty('--top-ad-h', h + 'px');
+        }
+
+        function updateVisibility() {
+            const active = activateBanner(getPreferredBanner());
+            if (!active) {
+                document.body.classList.remove('with-top-fixed-ad');
+                return;
+            }
+            const screenWidth = window.innerWidth || document.documentElement.clientWidth;
+            if (screenWidth <= 1024 && active.classList.contains('ad-desktop-only')) {
+                document.body.classList.remove('with-top-fixed-ad');
+                return;
+            }
+            applyTopBannerState();
+        }
+
+        window.addEventListener('load', applyTopBannerState);
+        setTimeout(applyTopBannerState, 300);
+        window.addEventListener('resize', function() { setTimeout(updateVisibility, 120); });
+    })();
+</script>
+<% } %>

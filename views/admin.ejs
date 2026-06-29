@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>Admin Paneli - 59 Haber Kutusu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #070b16;
+            --bg-alt: #0d1223;
+            --panel: rgba(18, 25, 44, 0.92);
+            --panel-border: rgba(255, 255, 255, 0.1);
+            --panel-strong: rgba(255, 255, 255, 0.08);
+            --gold: #d4af37;
+            --gold-soft: rgba(212, 175, 55, 0.16);
+            --white: #F8FAFC;
+            --text: #E5E7EB;
+            --text-muted: #9CA3AF;
+            --accent: #EF4444;
+            --accent-dark: #B91C1C;
+            --accent-soft: rgba(239, 68, 68, 0.14);
+        }
+
+        html,
+        body {
+            min-height: 100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            background: radial-gradient(circle at top left, rgba(212, 175, 55, 0.12), transparent 18%),
+                radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.06), transparent 18%),
+                linear-gradient(180deg, #0a111f 0%, #070b16 100%);
+            background-attachment: fixed;
+            line-height: 1.5;
+            overflow-y: auto;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.05), transparent 9%),
+                radial-gradient(circle at 90% 40%, rgba(212, 175, 55, 0.05), transparent 10%);
+            pointer-events: none;
+        }
+
+        /* Header */
+        .admin-header {
+            background: rgba(6, 10, 19, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--white);
+            padding: 18px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .admin-header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+        }
+
+        .admin-header h1 span {
+            color: var(--gold);
+        }
+
+        .admin-links {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .admin-links a {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .admin-links a:hover {
+            color: var(--white);
+            transform: translateY(-1px);
+        }
+
+        .admin-links a:last-child {
+            color: #F87171;
+        }
+
+        .admin-menu-toggle {
+            display: none;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border-radius: 12px;
+            padding: 12px 14px;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        /* Layout */
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 24px;
+            min-height: calc(100vh - 80px);
+            padding: 28px 32px 36px;
+        }
+
+        .form-panel,
+        .list-panel {
+            background: var(--panel);
+            border: 1px solid var(--panel-border);
+            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.24);
+            border-radius: 28px;
+            overflow: auto;
+            backdrop-filter: blur(18px);
+        }
+
+        .form-panel {
+            padding: 32px;
+            max-height: calc(100vh - 160px);
+        }
+
+        .form-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+            color: var(--white);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            font-family: inherit;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: rgba(212, 175, 55, 0.55);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.08);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .category-check-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .category-check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text);
+        }
+
+        .category-check-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--gold);
+        }
+
+        .file-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            color: var(--text);
+        }
+
+        .inline-upload-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .inline-upload-row .file-input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .btn-inline-upload {
+            padding: 12px 16px;
+            border: 1px solid rgba(212, 175, 55, 0.24);
+            border-radius: 16px;
+            background: rgba(212, 175, 55, 0.08);
+            color: var(--gold);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn-inline-upload:hover {
+            transform: translateY(-1px);
+            background: rgba(212, 175, 55, 0.14);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px 18px;
+            background: linear-gradient(120deg, rgba(212, 175, 55, 0.95), rgba(255, 211, 118, 0.95));
+            color: #111827;
+            border: none;
+            border-radius: 18px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 16px 30px rgba(212, 175, 55, 0.2);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-1px);
+            opacity: 0.95;
+        }
+
+        .btn-cancel {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            padding: 14px 0;
+            margin-top: 12px;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .btn-cancel:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+            color: var(--text);
+        }
+
+        .list-panel {
+            padding: 32px;
+            max-height: calc(100vh - 160px);
+            overflow: auto;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 18px;
+            margin-bottom: 26px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px 22px;
+            border-radius: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
+        }
+
+        .stat-card .num {
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--gold);
+        }
+
+        .stat-card .label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+        }
+
+        .list-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .list-header h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--white);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 18px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s, color 0.2s;
+            white-space: nowrap;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--white);
+        }
+
+        .filter-btn.active {
+            background: rgba(212, 175, 55, 0.16);
+            color: var(--gold);
+            border-color: rgba(212, 175, 55, 0.35);
+        }
+
+        .bulk-bar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 14px 20px;
+            margin-bottom: 20px;
+            padding: 16px 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+        }
+
+        .bulk-bar .btn-bulk {
+            padding: 12px 18px;
+            font-size: 13px;
+            font-weight: 800;
+            border-radius: 18px;
+            border: none;
+            cursor: pointer;
+            background: var(--accent-dark);
+            color: var(--white);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .bulk-bar .btn-bulk:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .bulk-bar .btn-bulk:not(:disabled):hover {
+            transform: translateY(-1px);
+        }
+
+        .bulk-bar label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--text);
+        }
+
+        .bulk-bar input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--gold);
+        }
+
+        .news-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .news-table th {
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .news-table td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            vertical-align: middle;
+            color: var(--text);
+        }
+
+        .news-table tr:hover td {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .news-row-img {
+            width: 60px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.28);
+        }
+
+        .news-row-title {
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.4;
+            color: var(--white);
+        }
+
+        .news-row-cat {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(212, 175, 55, 0.17);
+            color: var(--gold);
+        }
+
+        .news-row-date-main {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .news-row-date-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .news-row-date-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            color: #111827;
+            background: #34D399;
+            border-radius: 999px;
+            padding: 3px 8px;
+        }
+
+        .news-row-placement {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .news-row-placement.has-placement {
+            background: rgba(52, 211, 153, 0.14);
+            color: #A7F3D0;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            opacity: 0.95;
+        }
+
+        .btn-edit {
+            background: rgba(59, 130, 246, 0.12);
+            color: #93C5FD;
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.14);
+            color: #FCA5A5;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            font-size: 22px;
+            color: var(--white);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 900px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+                padding: 20px 22px 28px;
+            }
+
+            .form-panel {
+                max-height: none;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            }
+
+            .list-panel {
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-wrap: wrap;
+                gap: 14px;
+                padding: 18px 22px;
+            }
+
+            .admin-menu-toggle {
+                display: inline-flex;
+            }
+
+            .admin-links {
+                width: 100%;
+                display: none;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                padding-top: 8px;
+            }
+
+            .admin-links.open {
+                display: flex;
+            }
+
+            .admin-header a {
+                font-size: 14px;
+            }
+
+            .form-panel {
+                padding: 24px;
+            }
+
+            .list-panel {
+                padding: 24px;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .filter-bar {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div class="admin-header">
+        <h1><span>59</span> Haber Kutusu - Yönetim</h1>
+        <button type="button" class="admin-menu-toggle" id="adminMenuToggle" aria-label="Admin menü">&#9776;</button>
+        <div id="adminLinks" class="admin-links">
+            <a href="/<%= adminPath %>/kunye" style="color:#AB47BC;font-weight:600;">Künye Yönetimi</a>
+            <a href="/<%= adminPath %>/hakkinda" style="color:#FFA726;font-weight:600;">Hakkında Yönetimi</a>
+            <a href="/<%= adminPath %>/ads" style="color:#42A5F5;font-weight:600;">Reklam (PC)</a>
+            <a href="/<%= adminPath %>/ads-mobile" style="color:#66BB6A;font-weight:600;">Reklam (Mobil)</a>
+            <a href="/<%= adminPath %>/ads-common" style="color:#FFB300;font-weight:600;">Reklam (Ortak)</a>
+            <a href="/<%= adminPath %>/scraper" style="color:#66BB6A;font-weight:600;">Haber Çekici</a>
+            <a href="/">&#8592; Siteye Dön</a>
+            <a href="/<%= adminPath %>/cikis" style="color:#ef5350;">Çıkış Yap</a>
+        </div>
+    </div>
+
+    <div class="admin-layout">
+
+        <!-- Form Panel -->
+        <div class="form-panel">
+            <h3 class="form-title">
+                <%= editNews ? 'Haberi Düzenle' : 'Yeni Haber Ekle' %>
+            </h3>
+
+            <form action="<%= editNews ? '/api/news/' + editNews._id : '/api/news' %>" method="POST"
+                enctype="multipart/form-data" autocomplete="off">
+
+                <div class="form-group">
+                    <label>Başlık</label>
+                    <input type="text" name="title" required placeholder="Haber başlığını girin..."
+                        value="<%= editNews ? editNews.title : '' %>">
+                </div>
+
+                <div class="form-group">
+                    <label>Kısa Açıklama</label>
+                    <textarea name="description" required placeholder="Kısa açıklama yazın..."
+                        rows="3"><%= editNews ? editNews.description : '' %></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>İçerik</label>
+                    <textarea id="contentEditor" name="content" placeholder="Tam haber içeriği (opsiyonel)..."
+                        rows="8"><%= editNews ? editNews.content : '' %></textarea>
+                    <div class="inline-upload-row">
+                        <input id="inlineImageInput" type="file" accept="image/*" multiple class="file-input">
+                        <button type="button" id="insertInlineImageBtn" class="btn-inline-upload">Metin İçine Foto(lar)
+                            Ekle</button>
+                    </div>
+                    <p style="font-size:11px;color:var(--gray-600);margin-top:6px;">Uzun metinde imleci nereye
+                        bırakırsanız, fotoğraf(lar) o noktaya eklenir.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Kategoriler</label>
+                    <% const selectedCategories=editNews ? ((editNews.categories && editNews.categories.length ?
+                        editNews.categories : [editNews.category])) : []; %>
+                        <div class="category-check-grid">
+                            <% categories.forEach(cat=> { %>
+                                <label class="category-check-item">
+                                    <input type="checkbox" name="categories[]" value="<%= cat %>"
+                                        <%=selectedCategories.includes(cat) ? 'checked' : '' %>>
+                                    <span>
+                                        <%= cat %>
+                                    </span>
+                                </label>
+                                <% }) %>
+                        </div>
+                        <p style="font-size:11px;color:var(--gray-600);margin-top:6px;">Bir haber birden fazla
+                            kategoride yayınlanabilir.</p>
+                </div>
+
+                <div class="form-group">
+                    <label>Kaynak</label>
+                    <input type="text" name="sourceName" placeholder="Örn: 59 Haber Kutusu"
+                        value="<%= editNews ? (editNews.sourceName || (editNews.creditLabel === 'Kaynak' ? (editNews.creditName || '') : '')) : '' %>">
+                </div>
+
+                <div class="form-group">
+                    <label>Muhabir</label>
+                    <input type="text" name="reporterName" placeholder="Örn: Ege ARSLAN"
+                        value="<%= editNews ? (editNews.reporterName || (editNews.creditLabel === 'Muhabir' ? (editNews.creditName || '') : '')) : '' %>">
+                </div>
+
+                <div class="form-group">
+                    <label>Görsel</label>
+                    <input type="file" name="image" accept="image/*" class="file-input">
+                    <% if (editNews && editNews.image) { %>
+                        <input type="hidden" name="existingImage" value="<%= editNews.image %>">
+                        <p style="font-size: 11px; color: var(--gray-600); margin-top: 4px;">Mevcut: <%= editNews.image
+                                %>
+                        </p>
+                        <% } %>
+                </div>
+
+                <div class="form-group">
+                    <label>Ana Sayfa Görünürlüğü</label>
+                    <select name="placement">
+                        <option value="none" <%=editNews && editNews.placement==='none' ? 'selected' : (!editNews
+                            ? 'selected' : '' ) %>>Sadece Kategori Sayfasında</option>
+                        <option value="homepage" <%=editNews && editNews.placement==='homepage' ? 'selected' : '' %>>Ana
+                            Sayfada Göster</option>
+                        <option value="hero" <%=editNews && editNews.placement==='hero' ? 'selected' : '' %>>Manşet
+                            (Hero) Bölümü</option>
+                        <option value="both" <%=editNews && editNews.placement==='both' ? 'selected' : '' %>>Manşet +
+                            Ana Sayfa</option>
+                    </select>
+                    <div style="font-size:11px;color:var(--gray-600);margin-top:6px;line-height:1.5;">
+                        <strong>Sadece Kategori Sayfasında:</strong> Haber yalnızca kendi kategorisinin sayfasında
+                        görünür<br>
+                        <strong>Ana Sayfada Göster:</strong> Haber kendi kategorisinin bölümünde ana sayfada da
+                        görünür<br>
+                        <strong>Manşet:</strong> Ana sayfanın en üstündeki büyük manşet alanında görünür<br>
+                        <strong>Manşet + Ana Sayfa:</strong> Haber hem manşet alanında hem de kategori bölümünde görünür
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <%= editNews ? 'Güncelle' : 'Haberi Yayınla' %>
+                </button>
+                <% if (editNews) { %>
+                    <a href="/<%= adminPath %>" class="btn-cancel">İptal</a>
+                    <% } %>
+            </form>
+        </div>
+
+        <!-- List Panel -->
+        <div class="list-panel">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="num">
+                        <%= news.length %>
+                    </div>
+                    <div class="label">Toplam Haber</div>
+                </div>
+                <div class="stat-card">
+                    <div class="num">
+                        <%= news.filter(n=> n.placement === 'hero' || n.placement === 'both').length %>
+                    </div>
+                    <div class="label">Manşet</div>
+                </div>
+                <div class="stat-card">
+                    <div class="num">
+                        <%= news.filter(n=> n.placement === 'homepage' || n.placement === 'both').length %>
+                    </div>
+                    <div class="label">Ana Sayfa</div>
+                </div>
+                <div class="stat-card">
+                    <div class="num">
+                        <%= categories.length %>
+                    </div>
+                    <div class="label">Kategori</div>
+                </div>
+            </div>
+
+            <div class="list-header">
+                <h2>Haberler</h2>
+                <div class="filter-bar">
+                    <a href="/<%= adminPath %>" class="filter-btn <%= !category ? 'active' : '' %>">Tümü</a>
+                    <% categories.forEach(cat=> { %>
+                        <a href="/<%= adminPath %>?category=<%= encodeURIComponent(cat) %>"
+                            class="filter-btn <%= category === cat ? 'active' : '' %>">
+                            <%= cat %>
+                        </a>
+                        <% }) %>
+                            <form action="/api/news/delete-all" method="POST" style="display:inline;margin-left:12px;"
+                                onsubmit="return confirm('TÜM HABERLERİ silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')">
+                                <button type="submit" class="filter-btn"
+                                    style="background:#D32F2F;color:#fff;border-color:#D32F2F;cursor:pointer;">Tümünü
+                                    Sil</button>
+                            </form>
+                </div>
+            </div>
+
+            <% if (news.length===0) { %>
+                <div class="empty-state">
+                    <h3>Henüz haber yok</h3>
+                    <p>Sol panelden yeni haber ekleyerek başlayın.</p>
+                </div>
+                <% } else { %>
+                    <div class="bulk-bar">
+                        <button type="button" id="bulkDeleteBtn" class="btn-bulk" disabled>Seçilenleri sil (<span
+                                id="bulkSelCount">0</span>)</button>
+                        <label><input type="checkbox" id="selectAllNews" autocomplete="off"> Bu sayfadakilerin tümünü
+                            seç</label>
+                    </div>
+                    <table class="news-table">
+                        <thead>
+                            <tr>
+                                <th class="col-check" title="Seç"></th>
+                                <th>Görsel</th>
+                                <th>Başlık</th>
+                                <th>Kategori</th>
+                                <th>Yerleşim</th>
+                                <th>Tarih</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% news.forEach(item=> { %>
+                                <tr>
+                                    <td class="col-check">
+                                        <input type="checkbox" class="news-row-check" value="<%= item._id %>"
+                                            autocomplete="off" aria-label="Bu haberi seç">
+                                    </td>
+                                    <td>
+                                        <% if (item.image) { %>
+                                            <img src="<%= item.image %>" alt="" class="news-row-img">
+                                            <% } else { %>
+                                                <div
+                                                    style="width:60px;height:40px;background:var(--gray-200);border-radius:4px;">
+                                                </div>
+                                                <% } %>
+                                    </td>
+                                    <td><span class="news-row-title">
+                                            <%= item.title %>
+                                        </span></td>
+                                    <td>
+                                        <% const itemCategories=(item.categories && item.categories.length> 0) ?
+                                            item.categories : [item.category]; %>
+                                            <span class="news-row-cat">
+                                                <%= itemCategories.join(', ') %></span>
+                            </td>
+                            <td>
+                                <% const placementLabels = { ' none': '-' , 'homepage' : 'Ana Sayfa' , 'hero'
+                                                    : 'Manşet' , 'both' : 'Manşet + Ana Sayfa' }; %>
+                                                    <span
+                                                        class="news-row-placement <%= item.placement && item.placement !== 'none' ? 'has-placement' : '' %>">
+                                                        <%= placementLabels[item.placement] || '-' %>
+                                                    </span>
+                                    </td>
+                                    <td>
+                                        <% const hoursSincePublished=(Date.now() - new Date(item.createdAt).getTime()) /
+                                            (1000 * 60 * 60); %>
+                                            <% const daysSincePublished=Math.floor(hoursSincePublished / 24); %>
+                                                <div class="news-row-date">
+                                                    <span class="news-row-date-main">
+                                                        <%= item.createdAt.toLocaleDateString('tr-TR', { day: '2-digit'
+                                                            , month: '2-digit' , year: 'numeric' }) %>
+                                                            <%= item.createdAt.toLocaleTimeString('tr-TR', {
+                                                                hour: '2-digit' , minute: '2-digit' }) %>
+                                                    </span>
+                                                    <span class="news-row-date-sub">
+                                                        <% if (hoursSincePublished < 24) { %>
+                                                            Bugün eklendi
+                                                            <% } else if (daysSincePublished===1) { %>
+                                                                1 gün önce
+                                                                <% } else { %>
+                                                                    <%= daysSincePublished %> gün önce
+                                                                        <% } %>
+                                                    </span>
+                                                    <% if (hoursSincePublished < 24) { %>
+                                                        <span class="news-row-date-badge">Yeni</span>
+                                                        <% } %>
+                                                </div>
+                                    </td>
+                                    <td>
+                                        <a href="/<%= adminPath %>?edit=<%= item._id %>"
+                                            class="action-btn btn-edit">Düzenle</a>
+                                        <form action="/api/news/<%= item._id %>/delete" method="POST"
+                                            style="display:inline;"
+                                            onsubmit="return confirm('Bu haberi silmek istediğinize emin misiniz?')">
+                                            <button type="submit" class="action-btn btn-delete">Sil</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                    <% } %>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var adminMenuToggle = document.getElementById('adminMenuToggle');
+            var adminLinks = document.getElementById('adminLinks');
+            if (adminMenuToggle && adminLinks) {
+                adminMenuToggle.addEventListener('click', function () {
+                    adminLinks.classList.toggle('open');
+                });
+                window.addEventListener('resize', function () {
+                    if ((window.innerWidth || document.documentElement.clientWidth) > 768) {
+                        adminLinks.classList.remove('open');
+                    }
+                });
+            }
+
+            const btn = document.getElementById('insertInlineImageBtn');
+            const fileInput = document.getElementById('inlineImageInput');
+            const editor = document.getElementById('contentEditor');
+            if (!btn || !fileInput || !editor) return;
+            let lastSelectionStart = 0;
+            let lastSelectionEnd = 0;
+
+            function saveSelection() {
+                lastSelectionStart = editor.selectionStart || 0;
+                lastSelectionEnd = editor.selectionEnd || 0;
+            }
+
+            ['click', 'keyup', 'select', 'focus'].forEach(function (evt) {
+                editor.addEventListener(evt, saveSelection);
+            });
+            saveSelection();
+
+            btn.addEventListener('click', async function () {
+                const files = fileInput.files ? Array.from(fileInput.files) : [];
+                if (!files.length) {
+                    alert('Önce en az bir fotoğraf seçin.');
+                    return;
+                }
+
+                const formData = new FormData();
+                files.forEach(function (file) {
+                    formData.append('images', file);
+                });
+
+                btn.disabled = true;
+                btn.textContent = 'Yükleniyor...';
+                try {
+                    const response = await fetch('/api/news/upload-inline-image', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const raw = await response.text();
+                    let data = null;
+                    try {
+                        data = JSON.parse(raw);
+                    } catch (e) {
+                        // HTML dönmüşse genelde oturum/login redirect veya eski server sürümü
+                        if (response.redirected || response.url.includes('/giris') || raw.startsWith('<!DOCTYPE')) {
+                            throw new Error('Oturum süresi dolmuş olabilir. Sayfayı yenileyip tekrar giriş yapın.');
+                        }
+                        throw new Error('Sunucu beklenmeyen bir yanıt döndürdü. Sunucuyu yeniden başlatın.');
+                    }
+
+                    if (!response.ok || data.error || !Array.isArray(data.urls) || data.urls.length === 0) {
+                        throw new Error(data.error || 'Yükleme başarısız');
+                    }
+
+                    const insertText = '\n' + data.urls.map(function (url) {
+                        return '<img src="' + url + '" alt="" style="max-width:100%;height:auto;">';
+                    }).join('\n') + '\n';
+                    const start = lastSelectionStart;
+                    const end = lastSelectionEnd;
+                    const oldValue = editor.value || '';
+                    editor.value = oldValue.slice(0, start) + insertText + oldValue.slice(end);
+                    const nextPos = start + insertText.length;
+                    editor.focus();
+                    editor.setSelectionRange(nextPos, nextPos);
+                    saveSelection();
+                    fileInput.value = '';
+                } catch (err) {
+                    alert('Fotoğraf eklenemedi: ' + err.message);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Metin İçine Foto(lar) Ekle';
+                }
+            });
+        })();
+    </script>
+    <script>
+        (function bulkDeleteNews() {
+            const bulkBtn = document.getElementById('bulkDeleteBtn');
+            const selectAll = document.getElementById('selectAllNews');
+            const countEl = document.getElementById('bulkSelCount');
+            if (!bulkBtn || !selectAll || !countEl) return;
+
+            function rowChecks() {
+                return Array.prototype.slice.call(document.querySelectorAll('.news-row-check'));
+            }
+
+            function syncSelectAllState() {
+                const boxes = rowChecks();
+                const n = boxes.length;
+                const checked = boxes.filter(function (b) { return b.checked; }).length;
+                selectAll.checked = n > 0 && checked === n;
+                selectAll.indeterminate = checked > 0 && checked < n;
+            }
+
+            function updateBulkUi() {
+                const boxes = rowChecks();
+                const selected = boxes.filter(function (b) { return b.checked; });
+                countEl.textContent = String(selected.length);
+                bulkBtn.disabled = selected.length === 0;
+            }
+
+            selectAll.addEventListener('change', function () {
+                rowChecks().forEach(function (cb) { cb.checked = selectAll.checked; });
+                selectAll.indeterminate = false;
+                updateBulkUi();
+            });
+
+            document.querySelector('.news-table tbody')?.addEventListener('change', function (e) {
+                if (e.target && e.target.classList && e.target.classList.contains('news-row-check')) {
+                    syncSelectAllState();
+                    updateBulkUi();
+                }
+            });
+
+            bulkBtn.addEventListener('click', async function () {
+                const ids = rowChecks().filter(function (cb) { return cb.checked; }).map(function (cb) { return cb.value; });
+                if (!ids.length) return;
+                if (!confirm(ids.length + ' haberi kalıcı olarak silmek istediğinize emin misiniz? Kapak ve içerikteki GridFS görselleri de silinir.')) return;
+                bulkBtn.disabled = true;
+                try {
+                    const r = await fetch('/api/news/bulk-delete', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({ ids: ids })
+                    });
+                    const raw = await r.text();
+                    let data = {};
+                    try {
+                        data = raw ? JSON.parse(raw) : {};
+                    } catch (parseErr) {
+                        throw new Error('Sunucu JSON yerine başka bir yanıt döndürdü (HTTP ' + r.status + '). Oturum veya proxy kaynaklı olabilir.');
+                    }
+                    if (!r.ok || data.error) throw new Error(data.error || ('HTTP ' + r.status));
+                    if (!data.ok) throw new Error(data.error || 'İstek tamamlanamadı');
+                    window.location.reload();
+                } catch (e) {
+                    alert('Silinemedi: ' + e.message);
+                    updateBulkUi();
+                    syncSelectAllState();
+                }
+            });
+
+            syncSelectAllState();
+            updateBulkUi();
+        })();
+    </script>
+</body>
+
+</html>
